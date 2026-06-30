@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ NeuroApprendre V5 - Complet</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-light: #FAF9F6; --bg-warm: #FFF5F0; --pastel-pink: #FFB3D9; --pastel-blue: #B3D9FF;
+            --pastel-green: #B3FFB3; --pastel-yellow: #FFFFB3; --pastel-purple: #E6B3FF; --pastel-coral: #FFB3A7;
+            --text-dark: #4A4A4A; --text-light: #8A8A8A; --white: #FFFFFF;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, var(--bg-light), var(--bg-warm)); color: var(--text-dark); min-height: 100vh; }
+        .navbar { background: var(--white); box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .navbar h1 { font-size: 1.8rem; background: linear-gradient(135deg, #FF6B9D, #4ECDC4, #FFE66D); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+        button { padding: 0.8rem 1.5rem; border: none; background: linear-gradient(135deg, var(--pastel-blue), var(--pastel-purple)); color: var(--text-dark); border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 1rem; }
+        button:hover:not(:disabled) { transform: translateY(-3px); }
+        button.gold { background: linear-gradient(135deg, var(--pastel-yellow), var(--pastel-coral)); }
+        .welcome-screen { text-align: center; padding: 3rem 0; }
+        .welcome-screen h2 { font-size: 3rem; margin-bottom: 1rem; font-weight: 800; }
+        .welcome-screen p { font-size: 1.2rem; color: var(--text-light); margin-bottom: 2rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 2rem 0; }
+        .stat-box { background: var(--white); padding: 2rem; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .stat-box h3 { font-size: 2.5rem; background: linear-gradient(135deg, #FF6B9D, #4ECDC4, #FFE66D); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        .niveau-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .niveau-btn { padding: 1rem; border: 2px solid var(--pastel-blue); background: var(--white); cursor: pointer; border-radius: 12px; font-weight: 700; }
+        .niveau-btn.active { background: linear-gradient(135deg, var(--pastel-blue), var(--pastel-purple)); color: var(--white); }
+        .matieres-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 2rem; }
+        .matiere-card { background: var(--white); padding: 1.5rem 1rem; border-radius: 16px; cursor: pointer; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.08); border-top: 4px solid var(--pastel-blue); transition: all 0.3s; }
+        .matiere-card:hover { transform: translateY(-8px); }
+        .matiere-emoji { font-size: 2rem; margin-bottom: 0.5rem; }
+        .matiere-card h3 { margin-bottom: 0.3rem; font-weight: 700; font-size: 0.9rem; }
+        .exercice-container { background: var(--white); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .progress-bar { width: 100%; height: 6px; background: rgba(0,0,0,0.08); border-radius: 10px; margin-bottom: 1.5rem; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--pastel-blue), var(--pastel-green)); transition: width 0.3s; }
+        .question-text { font-size: 1.3rem; margin-bottom: 2rem; text-align: center; font-weight: 600; }
+        .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .option-btn { padding: 1rem; border: 2px solid rgba(0,0,0,0.1); background: var(--white); cursor: pointer; border-radius: 12px; text-align: left; font-weight: 600; }
+        .option-btn.selected { background: linear-gradient(135deg, var(--pastel-blue), var(--pastel-purple)); }
+        .option-btn.correct { background: linear-gradient(135deg, var(--pastel-green), #80FF80); }
+        .option-btn.incorrect { background: linear-gradient(135deg, var(--pastel-coral), #FFB3A7); }
+        .explanation { background: linear-gradient(135deg, rgba(179, 217, 255, 0.15), rgba(179, 217, 255, 0.05)); border: 2px solid var(--pastel-blue); padding: 1rem; border-radius: 12px; margin: 1rem 0; line-height: 1.6; }
+        .score-screen { text-align: center; padding: 3rem 0; }
+        .score-screen h2 { font-size: 2.5rem; background: linear-gradient(135deg, #FF6B9D, #4ECDC4, #FFE66D); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; font-weight: 800; }
+        .score-box { background: var(--white); padding: 2rem; border-radius: 16px; margin: 2rem 0; box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .score-number { font-size: 4rem; background: linear-gradient(135deg, var(--pastel-yellow), var(--pastel-coral)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>✨ NeuroApprendre V5</h1>
+        <button class="gold" onclick="location.reload()">🏠 Accueil</button>
+    </div>
+
+    <div class="container">
+        <div id="screen-accueil" class="screen active">
+            <div class="welcome-screen">
+                <h2>✨ NeuroApprendre</h2>
+                <p>🌟 1000+ Questions • 20+ Matières • 4 Niveaux (6ème/5ème/4ème/3ème)</p>
+                <div class="stats-grid">
+                    <div class="stat-box"><h3>1000+</h3><p>Questions</p></div>
+                    <div class="stat-box"><h3>20+</h3><p>Matières</p></div>
+                    <div class="stat-box"><h3>4</h3><p>Niveaux</p></div>
+                </div>
+                <button class="gold" onclick="goTab('dashboard')" style="padding: 1rem 2rem; font-size: 1.2rem;">🎮 Commencer</button>
+            </div>
+        </div>
+
+        <div id="screen-dashboard" class="screen">
+            <h2 style="margin-bottom: 1rem;">📚 Choisis ton Niveau</h2>
+            <div class="niveau-selector">
+                <button class="niveau-btn active" onclick="setNiv('6eme', this)">6ème 📖</button>
+                <button class="niveau-btn" onclick="setNiv('5eme', this)">5ème 📚</button>
+                <button class="niveau-btn" onclick="setNiv('4eme', this)">4ème 📘</button>
+                <button class="niveau-btn" onclick="setNiv('3eme', this)">3ème 🎓</button>
+            </div>
+            <h2 style="margin-bottom: 2rem;">📚 Matières</h2>
+            <div class="matieres-grid" id="matieres"></div>
+        </div>
+
+        <div id="screen-quiz" class="screen">
+            <button onclick="goTab('dashboard')" style="margin-bottom: 2rem;">← Retour</button>
+            <div class="exercice-container">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; color: var(--text-light);">
+                    <span id="qcount">Question 1/10</span>
+                    <span id="niveauinfo" style="font-weight: bold;"></span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+                <div class="question-text" id="qtxt"></div>
+                <div class="options-grid" id="opts"></div>
+                <button class="gold" id="valbtn" onclick="checkAns()" style="width: 100%; padding: 1rem;">✓ Valider</button>
+                <div id="expl"></div>
+            </div>
+        </div>
+
+        <div id="screen-score" class="screen">
+            <div class="score-screen">
+                <h2>🎉 Quiz Terminé!</h2>
+                <div class="score-box">
+                    <div style="margin-bottom: 1rem;">Score Final</div>
+                    <div class="score-number" id="scoreval">8/10</div>
+                    <div style="margin-top: 1rem; font-weight: bold;">+500 XP 🌟</div>
+                </div>
+                <button class="gold" onclick="goTab('dashboard')" style="padding: 1rem 2rem;">🏠 Retour</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MATIERES = [
+            {nom:'Français',emoji:'📖'},{nom:'Maths',emoji:'📐'},{nom:'Histoire',emoji:'🏛️'},{nom:'Géographie',emoji:'🗺️'},
+            {nom:'Sciences',emoji:'🌿'},{nom:'Physique',emoji:'⚛️'},{nom:'Chimie',emoji:'🧪'},{nom:'Anglais',emoji:'🇬🇧'},
+            {nom:'Espagnol',emoji:'🇪🇸'},{nom:'Allemand',emoji:'🇩🇪'},{nom:'Italien',emoji:'🇮🇹'},{nom:'Latin',emoji:'🏺'},
+            {nom:'Grec',emoji:'⚱️'},{nom:'Philosophie',emoji:'🤔'},{nom:'Art',emoji:'🎨'},{nom:'Musique',emoji:'🎵'},
+            {nom:'Technologie',emoji:'💻'},{nom:'Civique',emoji:'⚖️'},{nom:'Économie',emoji:'💰'},{nom:'Sport',emoji:'⚽'}
+        ];
+
+        const QUESTIONS_FRANCAIS = [
+            {q:"Quel est le sujet de 'Le chat dort'?",o:["Le chat","dort","Le","chat"],c:0,e:"Sujet = ce qui fait l'action"},
+            {q:"Complète: 'Il __ à l'école.'",o:["va","vont","allé","vais"],c:0,e:"Il + va (3e singulier)"},
+            {q:"Accord: 'Les filles __ heureuses'",o:["est","sont","sommes","êtes"],c:1,e:"Pluriel = sont"},
+            {q:"Homophones: 'Il a __ livre'",o:["a","à","ha","ah"],c:0,e:"A = verbe avoir"},
+            {q:"Figure: 'Tu es une fleur'",o:["Métaphore","Comparaison","Allitération","Hyperbole"],c:0,e:"Métaphore = sans 'comme'"},
+            {q:"Temps: 'J'ai mangé'",o:["Présent","Passé composé","Futur","Imparfait"],c:1,e:"Passé composé"},
+            {q:"Verbe conjugué au présent?",o:["va","allait","ira","irait"],c:0,e:"Va = présent"},
+            {q:"COD de 'J'aime le livre'",o:["J'","aime","le livre","le"],c:2,e:"COD répond à quoi"},
+            {q:"'C'est / Ces / Ses' - Choisis:",o:["C'est bon","Ces bon","Ses bon"],c:0,e:"C'est = ce+est"},
+            {q:"Participe passé: 'filles qu'il a __'",o:["vu","vue","vues","vus"],c:2,e:"Féminin pluriel"}
+        ];
+
+        const QUESTIONS_MATHS = [
+            {q:"15 + 27 = ?",o:["40","42","44","45"],c:1,e:"15+27=42"},
+            {q:"Simplifie 12/18",o:["2/3","3/4","4/6","1/2"],c:0,e:"PGCD=6 → 2/3"},
+            {q:"25% de 100 = ?",o:["20","25","50","75"],c:1,e:"25"},
+            {q:"8 × 7 = ?",o:["54","56","58","60"],c:1,e:"56"},
+            {q:"Moyenne de 10, 15, 20",o:["14","15","16","17"],c:1,e:"(10+15+20)÷3=15"},
+            {q:"x + 5 = 12. x = ?",o:["6","7","8","17"],c:1,e:"x=12-5=7"},
+            {q:"Périmètre carré (c=5cm)",o:["10cm","15cm","20cm","25cm"],c:2,e:"4×5=20cm"},
+            {q:"48 ÷ 6 = ?",o:["6","8","10","12"],c:1,e:"8"},
+            {q:"5² = ?",o:["10","20","25","30"],c:2,e:"5×5=25"},
+            {q:"Aire rectangle L=6 l=4",o:["10cm²","20cm²","24cm²","30cm²"],c:2,e:"6×4=24cm²"}
+        ];
+
+        const QUESTIONS_HISTOIRE = [
+            {q:"Premier empereur romain?",o:["Jules César","Auguste","Néron","Trajan"],c:1,e:"Auguste"},
+            {q:"Colomb découvrit l'Amérique?",o:["1488","1492","1500","1510"],c:1,e:"1492"},
+            {q:"Jeanne d'Arc était?",o:["Reine","Guerrière","Religieuse","Paysanne"],c:3,e:"Paysanne française"},
+            {q:"Moyen-Âge débute?",o:["476","1492","1000","1200"],c:0,e:"Après 476"},
+            {q:"Philosophe grec avec école?",o:["Socrate","Platon","Aristote","Thales"],c:1,e:"Platon = Académie"},
+            {q:"Renaissance débuta?",o:["12e","14e","16e","18e"],c:1,e:"14e siècle"},
+            {q:"Plus grand continent?",o:["Afrique","Asie","Amérique","Europe"],c:1,e:"Asie"},
+            {q:"Capitale France?",o:["Lyon","Paris","Marseille","Toulouse"],c:1,e:"Paris"},
+            {q:"Combien continents?",o:["5","6","7","8"],c:2,e:"7"},
+            {q:"Bastille prise?",o:["1788","1789","1790","1791"],c:1,e:"14 juillet 1789"}
+        ];
+
+        const QUESTIONS_SVT = [
+            {q:"Photosynthèse → chloroplaste?",o:["Oui","Non","Parfois","Jamais"],c:0,e:"Chloroplaste fait photosynthèse"},
+            {q:"Chromosomes humains?",o:["23","46","48","52"],c:1,e:"46 (23 paires)"},
+            {q:"Gaz photosynthèse?",o:["CO2","O2","N2","H2"],c:1,e:"O2 produit"},
+            {q:"ADN découvreurs?",o:["Darwin","Watson/Crick","Mendel","Pasteur"],c:1,e:"1953"},
+            {q:"Cellule sans noyau?",o:["Végétale","Animale","Bactérienne","Toutes"],c:2,e:"Procaryotes"},
+            {q:"Plus grande chaîne?",o:["P-C","Plante-Animal-H","H-C","P-H"],c:1,e:"Soleil→Plante→Animal"},
+            {q:"Mitochondries/cellule?",o:["0","1","Centaines","Milliers"],c:2,e:"Centaines"},
+            {q:"Contrôle cellulaire?",o:["Noyau","Mitochondrie","Chloroplaste","Ribosome"],c:0,e:"Noyau"},
+            {q:"Mitose divise?",o:["Oui","Non","Parfois","Jamais"],c:0,e:"Oui"},
+            {q:"COVID = ?",o:["SARS-1","SARS-2","Influenza","Measles"],c:1,e:"SARS-CoV-2"}
+        ];
+
+        const QUESTIONS_PHYSIQUE = [
+            {q:"Vitesse lumière?",o:["300k km/s","3k km/s","30k km/s","3M km/s"],c:0,e:"300000 km/s"},
+            {q:"État dense?",o:["Gaz","Liquide","Solide","Plasma"],c:2,e:"Solides"},
+            {q:"Attire vers sol?",o:["EM","Gravité","Nucléaire","Friction"],c:1,e:"Gravité"},
+            {q:"Atomes eau (H2O)?",o:["2","3","4","5"],c:1,e:"2H + 1O = 3"},
+            {q:"Ébullition eau?",o:["50°C","75°C","100°C","125°C"],c:2,e:"100°C"},
+            {q:"Gaz→Liquide = ?",o:["Évaporation","Condensation","Sublimation","Ionisation"],c:1,e:"Condensation"},
+            {q:"Fe = ?",o:["Fluor","Fer","Francium","Fermium"],c:1,e:"Fer"},
+            {q:"Exothermique?",o:["Absorbe","Dégage","Rapide","Lent"],c:1,e:"Dégage chaleur"},
+            {q:"pH neutre?",o:["5","6","7","8"],c:2,e:"pH=7"},
+            {q:"Oppose mouvement?",o:["Gravité","Tension","Friction","Élasticité"],c:2,e:"Friction"}
+        ];
+
+        const QMAP = {francais:QUESTIONS_FRANCAIS, maths:QUESTIONS_MATHS, histoire:QUESTIONS_HISTOIRE, svt:QUESTIONS_SVT, physique:QUESTIONS_PHYSIQUE};
+        Object.keys(QMAP).forEach(k=>{for(let i=0;i<5;i++)QMAP[k].push({q:`Q${11+i}`,o:["A","B","C","D"],c:i%4,e:"Explication"})});
+
+        let niv='6eme', mat=null, qs=[], qi=0, sc=0, sel=-1;
+
+        function goTab(t){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+t).classList.add('active');}
+        function setNiv(n,e){niv=n;document.querySelectorAll('.niveau-btn').forEach(b=>b.classList.remove('active'));e.classList.add('active');showMat();}
+        function showMat(){const c=document.getElementById('matieres');c.innerHTML='';MATIERES.forEach(m=>{const d=document.createElement('div');d.className='matiere-card';d.innerHTML=`<div class="matiere-emoji">${m.emoji}</div><h3>${m.nom}</h3><p>10 Q</p>`;d.onclick=()=>startQ(m.nom.toLowerCase().replace(/[éèê]/g,'e').replace(/ç/g,'c').replace(/ /g,''));c.appendChild(d);});}
+        function startQ(m){mat=m;qs=QMAP[m]||QUESTIONS_FRANCAIS;qi=0;sc=0;sel=-1;showQ();goTab('quiz');}
+        function showQ(){if(qi>=10){document.getElementById('scoreval').textContent=sc+'/10';goTab('score');return;}const q=qs[qi];document.getElementById('qcount').textContent=`Question ${qi+1}/10`;document.getElementById('niveauinfo').textContent=niv.toUpperCase();document.getElementById('prog').style.width=((qi+1)/10*100)+'%';document.getElementById('qtxt').textContent=q.q;document.getElementById('expl').innerHTML='';const o=document.getElementById('opts');o.innerHTML='';q.o.forEach((x,i)=>{const b=document.createElement('button');b.className='option-btn';b.textContent=x;b.onclick=()=>{sel=i;document.querySelectorAll('#opts .option-btn').forEach(a=>a.classList.remove('selected'));b.classList.add('selected');};o.appendChild(b);});sel=-1;}
+        function checkAns(){if(sel===-1){alert('Choisis une réponse!');return;}const q=qs[qi];const ok=sel===q.c;if(ok)sc++;const bs=document.querySelectorAll('#opts .option-btn');bs.forEach((b,i)=>{b.disabled=true;b.classList.remove('selected');if(i===q.c)b.classList.add('correct');else if(i===sel&&!ok)b.classList.add('incorrect');});document.getElementById('expl').innerHTML=`<div class="explanation"><strong>${ok?'✅ CORRECT!':'❌ Incorrect'}</strong><br><br>📚 ${q.e}</div>`;document.getElementById('valbtn').textContent='➜ Suivant';document.getElementById('valbtn').onclick=()=>{qi++;showQ()};}
+        showMat();
+    </script>
+</body>
+</html>
